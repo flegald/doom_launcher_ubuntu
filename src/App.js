@@ -4,6 +4,7 @@ import Navigation from './components/navigation';
 import IWads from './components/iwads';
 import Engines from './components/engines';
 import './App.css';
+import './styles/custom.css';
 
 
 const styles = {
@@ -28,10 +29,16 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      wads: [],
+      flaggeddWads: [],
+      iwad: null,
+      engine: null,
       iWadModal: false,
       engineModel: false
     };
+    this.processUploadedWad = this.processUploadedWad.bind(this);
   }
+
 
   showIwadModel() {
     this.setState({
@@ -45,6 +52,36 @@ class App extends Component {
     })
   }
 
+  processUploadedWad(selectorFiles: FileList) {
+    var currWads = this.state.wads;
+    var newWads = currWads;
+    newWads.push([selectorFiles.item(0).name, selectorFiles.item(0).path])
+    this.setState({
+      wads: newWads
+    })
+  }
+
+  // updateFlaggedWads(values) {
+  //   var newFlaggedWads = [];
+  //   values.map( wad => {
+  //     newFlaggedWads.push(wad)
+  //   })
+  //   this.setState({
+  //     flaggeddWads: newFlaggedWads
+  //   }, function(){console.log(this.state)})
+  // }
+
+updateFlaggedWads(values){
+  console.log(values)
+
+  }
+
+
+  removeWads(){
+
+  }
+
+
   render() {
     return (
       <div className="App">
@@ -57,16 +94,16 @@ class App extends Component {
             <Form>
               <FormGroup>
                 <Label for="mods">WADS / Mods</Label>
-                <Input type="select" name="mods" id="mods" multiple style={ styles.wads } >
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
+                <Input type="select" name="mods" id="mods" multiple style={ styles.wads } onChange={ (e) => this.updateFlaggedWads(e.target) } >
+                { this.state.wads.map(wad => {
+                  return <option key={wad[0]} value={wad[1]}>{wad[0]}</option>
+                })} 
                 </Input>
               </FormGroup>
             </Form>
-            <Button color="primary" style={ styles.modButtons }>Add</Button>
+            <span className="btn btn-primary btn-file">
+              ADD <input style={{display: "hidden"}} type="file" onChange={ (e) => this.processUploadedWad(e.target.files) }/>
+            </span>
             <Button color="secondary" style={ styles.modButtons }>Remove</Button>
           </Col>
           <Col>
@@ -74,19 +111,9 @@ class App extends Component {
               <FormGroup>
                 <Label for="iwads">IWADS</Label>
                 <Input type="select" name="iwads" id="iwads" multiple style={ styles.iwads } >
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
                 </Input>
                 <Label for="engines">Engines</Label>
                 <Input type="select" name="engines" id="engines" multiple style={ styles.iwads }>
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
                 </Input>
               </FormGroup>
             </Form>

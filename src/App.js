@@ -37,6 +37,8 @@ class App extends Component {
       engineModel: false
     };
     this.processUploadedWad = this.processUploadedWad.bind(this);
+    this.removeWads = this.removeWads.bind(this);
+    this.resetUpload = this.resetUpload.bind(this)
   }
 
 
@@ -53,32 +55,47 @@ class App extends Component {
   }
 
   processUploadedWad(selectorFiles: FileList) {
+    if (!selectorFiles){
+      return
+    }
     var currWads = this.state.wads;
     var newWads = currWads;
     newWads.push([selectorFiles.item(0).name, selectorFiles.item(0).path])
+    console.log(newWads);
     this.setState({
       wads: newWads
     })
   }
 
-  // updateFlaggedWads(values) {
-  //   var newFlaggedWads = [];
-  //   values.map( wad => {
-  //     newFlaggedWads.push(wad)
-  //   })
-  //   this.setState({
-  //     flaggeddWads: newFlaggedWads
-  //   }, function(){console.log(this.state)})
-  // }
-
-updateFlaggedWads(values){
-  console.log(values)
-
+  resetUpload(target){
+    target.value = "";
   }
 
 
-  removeWads(){
+updateFlaggedWads(options){
+  var flagged = [];
+  for (var i = 0, l = options.length; i < l; i++) {
+    if (options[i].selected) {
+      flagged.push(options[i].value);
+    }
+  }
+  this.setState({
+    flaggeddWads: flagged
+  })
+}
 
+  removeWads(){
+    var oldWads = this.state.wads;
+    var newWads = [];
+    for (var wad in oldWads){
+      if (!this.state.flaggeddWads.includes(oldWads[wad][1])){
+        newWads.push(oldWads[wad])
+      }
+    }
+    this.setState({
+      wads: newWads,
+      flaggeddWads: []
+    })
   }
 
 
@@ -94,7 +111,7 @@ updateFlaggedWads(values){
             <Form>
               <FormGroup>
                 <Label for="mods">WADS / Mods</Label>
-                <Input type="select" name="mods" id="mods" multiple style={ styles.wads } onChange={ (e) => this.updateFlaggedWads(e.target) } >
+                <Input type="select" name="mods" id="mods" multiple style={ styles.wads } onChange={ (e) => this.updateFlaggedWads(e.target.options) } >
                 { this.state.wads.map(wad => {
                   return <option key={wad[0]} value={wad[1]}>{wad[0]}</option>
                 })} 
@@ -102,9 +119,14 @@ updateFlaggedWads(values){
               </FormGroup>
             </Form>
             <span className="btn btn-primary btn-file">
-              ADD <input style={{display: "hidden"}} type="file" onChange={ (e) => this.processUploadedWad(e.target.files) }/>
+              ADD <input style={{display: "hidden"}} 
+                         type="file" 
+                         accept=".wad, .pk3, .WAD, .PK3" 
+                         onClick={ (e) => this.resetUpload(e.target)} 
+                         onChange={ (e) => this.processUploadedWad(e.target.files) }
+                    />
             </span>
-            <Button color="secondary" style={ styles.modButtons }>Remove</Button>
+            <Button color="secondary" style={ styles.modButtons } onClick={this.removeWads} >Remove</Button>
           </Col>
           <Col>
             <Form>
